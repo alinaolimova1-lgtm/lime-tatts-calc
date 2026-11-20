@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор стоимости тату — LIME TATTS | Алина Олимова</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --card: #171a21;
+      --card-hover: #1f242e;
+      --border: #282e3b;
+      --accent: #a3e635;
+      --accent-dim: rgba(163, 230, 53, 0.14);
+      --session-color: #fbbf24;
+      --session-dim: rgba(251, 191, 36, 0.14);
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px 14px 44px;
+      line-height: 1.45;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 580px;
+    }
+
+    .header {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .brand-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-size: 13.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .studio {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .top-contacts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .contact-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      background: #171a21;
+      border: 1px solid var(--border);
+      padding: 6px 11px;
+      border-radius: 999px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .contact-pill:hover {
+      background: var(--card-hover);
+      border-color: var(--accent);
+    }
+
+    .contact-pill.vk {
+      border-color: rgba(163, 230, 53, 0.45);
+      color: var(--accent);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px 18px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    .progress-wrap {
+      margin-bottom: 20px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #222630;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 13.5px;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    @media (min-width: 480px) {
+      .options-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .options-grid .option:last-child:nth-child(odd) {
+        grid-column: span 2;
+      }
+    }
+
+    .option {
+      background: #13161c;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 13px 14px;
+      text-align: left;
+      color: var(--text);
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .option:hover {
+      background: var(--card-hover);
+      border-color: #3d4659;
+    }
+
+    .option.selected {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .opt-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .opt-title {
+      font-size: 14.5px;
+      font-weight: 600;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      background: #232834;
+      color: var(--accent);
+      white-space: nowrap;
+      font-weight: 600;
+    }
+
+    .opt-desc {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .info-banner {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(163, 230, 53, 0.08);
+      border: 1px solid rgba(163, 230, 53, 0.25);
+      font-size: 12.5px;
+      color: #d9f99d;
+    }
+
+    .nav-row {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.99);
+    }
+
+    .btn-ghost {
+      background: #222630;
+      color: var(--text);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #111418;
+      width: 100%;
+    }
+
+    .btn-secondary {
+      background: #222630;
+      color: var(--text);
+      width: 100%;
+    }
+
+    .result-box {
+      background: #13161c;
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 14px;
+    }
+
+    .price-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .price-label {
+      font-size: 12.5px;
+      color: var(--muted);
+    }
+
+    .scope-pill {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+
+    .scope-pill.project {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border: 1px solid rgba(163, 230, 53, 0.4);
+    }
+
+    .scope-pill.session {
+      background: var(--session-dim);
+      color: var(--session-color);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+    }
+
+    .price-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .session-sub {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--session-color);
+      background: var(--session-dim);
+      border: 1px solid rgba(251, 191, 36, 0.3);
+      padding: 7px 11px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .detail-note {
+      font-size: 13px;
+      color: #e5e7eb;
+      margin-bottom: 14px;
+    }
+
+    .slider-panel {
+      background: #191d26;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 13px 14px;
+      margin-bottom: 14px;
+    }
+
+    .slider-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .slider-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .slider-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-dim);
+      padding: 2px 9px;
+      border-radius: 7px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+      height: 6px;
+      background: #262b36;
+      border-radius: 999px;
+    }
+
+    .slider-ticks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .summary-list {
+      list-style: none;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 13.5px;
+    }
+
+    .summary-list li span {
+      color: var(--muted);
+    }
+
+    .note {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 13px 14px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .note b, .note strong {
+      color: var(--text);
+    }
+
+    .community-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .community-link:hover {
+      text-decoration: underline;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .copied-toast {
+      font-size: 12.5px;
+      color: var(--accent);
+      text-align: center;
+      min-height: 18px;
+      margin-top: 4px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="brand-row">
+        <div>
+          <div class="brand">LIME TATTS • Алина Олимова</div>
+          <div class="studio">Омск • студия Art13, Почтовая 4</div>
+        </div>
+      </div>
+      <div class="top-contacts">
+        <a href="https://vk.com/limetatts" target="_blank" rel="noopener noreferrer" class="contact-pill vk js-ext-link" data-url="https://vk.com/limetatts">ВК сообщество</a>
+        <a href="https://t.me/limetatts" target="_blank" rel="noopener noreferrer" class="contact-pill js-ext-link" data-url="https://t.me/limetatts">Telegram @limetatts</a>
+        <a href="tel:+79131560256" class="contact-pill">+7 913 156-02-56</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <div id="quiz-view">
+        <div class="progress-wrap">
+          <div class="progress-top">
+            <span id="step-counter">Шаг 1 из 2</span>
+            <span id="step-percent">50%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 50%"></div>
+          </div>
+        </div>
+
+        <h1 id="step-title"></h1>
+        <p class="subtitle" id="step-subtitle"></p>
+
+        <div class="options-grid" id="options-container"></div>
+        <div class="info-banner hidden" id="step-banner"></div>
+
+        <div class="nav-row">
+          <button type="button" class="btn btn-ghost" id="back-btn">← Назад</button>
+          <span style="font-size: 12px; color: var(--muted);">Нажми на подходящий вариант</span>
+        </div>
+      </div>
+
+      <div id="result-view" class="hidden">
+        <h1>Ориентировочный расчёт</h1>
+        <p class="subtitle">Подвинь ползунок ниже под размер и плотность деталей</p>
+
+        <div class="result-box">
+          <div class="price-head">
+            <div class="price-label">Примерная стоимость</div>
+            <div class="scope-pill project" id="scope-pill">ЗА ВЕСЬ ПРОЕКТ</div>
+          </div>
+          <div class="price-value" id="price-range">0 ₽</div>
+          <div class="session-sub hidden" id="session-sub"></div>
+          <div class="detail-note" id="price-detail"></div>
+
+          <div class="slider-panel">
+            <div class="slider-top">
+              <span class="slider-title" id="slider-title">Уточни размер / детализацию</span>
+              <span class="slider-val" id="slider-val-label">Средне</span>
+            </div>
+            <input type="range" id="detail-slider" min="0" max="100" value="50" />
+            <div class="slider-ticks">
+              <span id="tick-min">Минимум / проще</span>
+              <span id="tick-max">Максимум / сложнее</span>
+            </div>
+          </div>
+
+          <ul class="summary-list" id="summary-list"></ul>
+        </div>
+
+        <div class="note">
+          <div>
+            Подробнее лучше уточнять лично — итоговая цена зависит от точного размера, детализации эскиза и особенностей кожи.
+          </div>
+          <div>
+            Приходи на <strong>бесплатную консультацию</strong> в студию <strong>Art13</strong> (Почтовая, 4) — там мы сможем <strong>примерить любой эскиз</strong> прямо на месте.
+          </div>
+          <div>
+            ВК: <a class="community-link js-ext-link" href="https://vk.com/limetatts" data-url="https://vk.com/limetatts" target="_blank" rel="noopener noreferrer">https://vk.com/limetatts</a><br />
+            Telegram: <a class="community-link js-ext-link" href="https://t.me/limetatts" data-url="https://t.me/limetatts" target="_blank" rel="noopener noreferrer">https://t.me/limetatts</a><br />
+            Телефон: <a class="community-link" href="tel:+79131560256">+7 913 156-02-56</a>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="copy-btn">Скопировать расчёт для отправки в ВК</button>
+          <a href="https://vk.com/limetatts" data-url="https://vk.com/limetatts" target="_blank" rel="noopener noreferrer" class="btn btn-secondary js-ext-link">Перейти в сообщество ВК (LIME TATTS)</a>
+          <button type="button" class="btn btn-ghost" id="restart-btn">Посчитать заново</button>
+        </div>
+        <div class="copied-toast" id="copied-toast"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const ZONES = [
+      {
+        id: "up_to_5",
+        label: "До 5 см",
+        desc: "Мини-тату: линии или графика",
+        badge: "до 5 см",
+        slider: { title: "Размер в см и детали", minLabel: "1–2 см / просто", maxLabel: "5 см / детали", unit: "cm", min: 1, max: 5, step: 0.5, def: 3 }
+      },
+      {
+        id: "up_to_20",
+        label: "До 20 см",
+        desc: "Надписи, графика, цвет, перекрытие или блэкворк",
+        badge: "до 20 см",
+        slider: { title: "Размер в см и детализация", minLabel: "6 см / проще", maxLabel: "20 см / плотно", unit: "cm", min: 6, max: 20, step: 1, def: 13 }
+      },
+      {
+        id: "forearm",
+        label: "Предплечье",
+        desc: "Работа на предплечье в выбранном стиле",
+        badge: "Рука",
+        slider: { title: "Площадь и детализация", minLabel: "Компактнее", maxLabel: "Во всё предплечье", unit: "pct", min: 30, max: 100, step: 5, def: 65 }
+      },
+      {
+        id: "shoulder",
+        label: "Плечо",
+        desc: "Работа на плече (расчёт по проекту и сеансам)",
+        badge: "Рука",
+        slider: { title: "Масштаб и детализация", minLabel: "Меньше деталей", maxLabel: "Плотнее / крупнее", unit: "pct", min: 30, max: 100, step: 5, def: 65 }
+      },
+      {
+        id: "shin",
+        label: "Голень",
+        desc: "Работа на голени (по стоимости как плечо)",
+        badge: "Нога",
+        slider: { title: "Масштаб и детализация", minLabel: "Меньше деталей", maxLabel: "Плотнее / крупнее", unit: "pct", min: 30, max: 100, step: 5, def: 65 }
+      },
+      {
+        id: "hip",
+        label: "Бедро",
+        desc: "Крупная зона с разбивкой по сеансам",
+        badge: "Нога",
+        slider: { title: "Масштаб и детализация", minLabel: "Средний объём", maxLabel: "Крупный / плотный", unit: "pct", min: 30, max: 100, step: 5, def: 65 }
+      },
+      {
+        id: "sleeve",
+        label: "Рукав",
+        desc: "Внешняя часть или полный оборот руки",
+        badge: "Масштаб",
+        slider: { title: "Объём рукава и детали", minLabel: "Внешняя часть", maxLabel: "Полный оборот", unit: "pct", min: 40, max: 100, step: 5, def: 70 }
+      },
+      {
+        id: "back",
+        label: "Спина",
+        desc: "Часть спины или вся спина целиком",
+        badge: "Масштаб",
+        slider: { title: "Объём спины и детали", minLabel: "Часть спины", maxLabel: "Вся спина", unit: "pct", min: 30, max: 100, step: 5, def: 65 }
+      }
+    ];
+
+    const STYLES = [
+      { id: "lines", label: "Линии / графика", desc: "Тонкие линии, надписи или лёгкая графика", badge: "Линии" },
+      { id: "graphics", label: "Графика (линии, тени)", desc: "Графика с тенями и проработкой деталей", badge: "Графика" },
+      { id: "color", label: "Цветная татуировка", desc: "Работа с цветными пигментами", badge: "Цвет" },
+      { id: "cover", label: "Перекрытие (тату или шрамы)", desc: "Перекрытие старой работы или шрамов", badge: "Перекрытие" },
+      { id: "blackwork", label: "Блэкворк (много чёрного)", desc: "Плотный чёрный прокрас и крупные заливки", badge: "Блэкворк" }
+    ];
+
+    const PRICE_MATRIX = {
+      up_to_5: {
+        lines: { min: 3000, max: 6000, scope: "project", sessionNote: null, detail: "Цена указана за всю татуировку (линии / графика до 5 см)." }
+      },
+      up_to_20: {
+        lines: { min: 7000, max: 9000, scope: "project", sessionNote: null, detail: "Цена указана за всю работу (линии / надписи до 20 см)." },
+        graphics: { min: 6000, max: 10000, scope: "project", sessionNote: null, detail: "Цена указана за всю работу (зависит от количества деталей)." },
+        color: { min: 8000, max: 11000, scope: "project", sessionNote: null, detail: "Цена указана за всю цветную татуировку до 20 см." },
+        cover: { min: 12000, max: 15000, scope: "session", sessionNote: "Оплата по сеансам: 12 000 – 15 000 ₽ за 1 сеанс", detail: "Для перекрытия цена рассчитывается за каждый сеанс." },
+        blackwork: { min: 10000, max: 13000, scope: "session", sessionNote: "Оплата по сеансам: 10 000 – 13 000 ₽ за 1 сеанс", detail: "Для блэкворка цена рассчитывается за каждый сеанс." }
+      },
+      forearm: {
+        lines: { min: 7000, max: 9000, scope: "project", sessionNote: null, detail: "Цена указана за весь проект на предплечье." },
+        graphics: { min: 8000, max: 11000, scope: "project", sessionNote: null, detail: "Цена указана за весь проект на предплечье." },
+        color: { min: 9000, max: 12000, scope: "project", sessionNote: null, detail: "Цена указана за весь проект на предплечье." },
+        cover: { min: 12000, max: 14000, scope: "project", sessionNote: null, detail: "Цена указана за перекрытие на предплечье." },
+        blackwork: { min: 15000, max: 15000, scope: "project", sessionNote: null, detail: "Фиксированный ориентир 15 000 ₽ за весь проект на предплечье." }
+      },
+      shoulder: {
+        lines: { min: 8000, max: 11000, scope: "session", sessionNote: "Оплата за сеанс: 8 000 – 11 000 ₽", detail: "Цена указана за 1 сеанс работы линиями на плече." },
+        graphics: { min: 12000, max: 18000, scope: "project", sessionNote: "Разбивается на сеансы по 6 000 – 9 000 ₽ за сеанс", detail: "Сверху указана стоимость всего проекта на плече." },
+        color: { min: 16000, max: 20000, scope: "project", sessionNote: "Разбивается на сеансы по 8 000 – 10 000 ₽ за сеанс", detail: "Сверху указана стоимость всего проекта на плече." },
+        cover: { min: 20000, max: 30000, scope: "project", sessionNote: "Разбивается на сеансы по 10 000 – 15 000 ₽ за сеанс", detail: "Сверху указана стоимость всего перекрытия на плече." },
+        blackwork: { min: 15000, max: 20000, scope: "session", sessionNote: "Оплата за сеанс: 15 000 – 20 000 ₽", detail: "Цена указана за 1 сеанс блэкворка на плече." }
+      },
+      shin: {
+        lines: { min: 8000, max: 11000, scope: "session", sessionNote: "Оплата за сеанс: 8 000 – 11 000 ₽", detail: "Цена указана за 1 сеанс работы линиями на голени." },
+        graphics: { min: 12000, max: 18000, scope: "project", sessionNote: "Разбивается на сеансы по 6 000 – 9 000 ₽ за сеанс", detail: "Сверху указана стоимость всего проекта на голени." },
+        color: { min: 16000, max: 20000, scope: "project", sessionNote: "Разбивается на сеансы по 8 000 – 10 000 ₽ за сеанс", detail: "Сверху указана стоимость всего проекта на голени." },
+        cover: { min: 20000, max: 30000, scope: "project", sessionNote: "Разбивается на сеансы по 10 000 – 15 000 ₽ за сеанс", detail: "Сверху указана стоимость всего перекрытия на голени." },
+        blackwork: { min: 15000, max: 20000, scope: "session", sessionNote: "Оплата за сеанс: 15 000 – 20 000 ₽", detail: "Цена указана за 1 сеанс блэкворка на голени." }
+      },
+      hip: {
+        lines: { min: 8000, max: 11000, scope: "session", sessionNote: "Оплата за сеанс: 8 000 – 11 000 ₽", detail: "Цена указана за 1 сеанс работы линиями на бедре." },
+        graphics: { min: 18000, max: 27000, scope: "project", sessionNote: "Разбивается на сеансы по 6 000 – 9 000 ₽ за сеанс", detail: "Сверху указана стоимость всего проекта на бедре." },
+        color: { min: 24000, max: 30000, scope: "project", sessionNote: "Разбивается на сеансы по 8 000 – 10 000 ₽ за сеанс", detail: "Сверху указана стоимость всего проекта на бедре." },
+        cover: { min: 30000, max: 45000, scope: "project", sessionNote: "Разбивается на сеансы по 10 000 – 15 000 ₽ за сеанс", detail: "Сверху указана стоимость всего перекрытия на бедре." },
+        blackwork: { min: 30000, max: 40000, scope: "project", sessionNote: "Разбивается на сеансы по 12 000 – 15 000 ₽ за сеанс", detail: "Сверху указана стоимость всего блэкворка на бедре." }
+      },
+      sleeve: {
+        lines: { min: 15000, max: 36000, scope: "project", sessionNote: null, detail: "Цена за весь проект: от внешней части (15 т.р.) до полного рукава (36 т.р.)." },
+        graphics: { min: 30000, max: 80000, scope: "project", sessionNote: null, detail: "Цена за весь проект: внешняя часть или полный рукав." },
+        color: { min: 30000, max: 90000, scope: "project", sessionNote: null, detail: "Цена за весь проект: внешняя часть или полный рукав." },
+        cover: { min: 60000, max: 120000, scope: "project", sessionNote: null, detail: "Цена за весь проект: внешняя часть или полный рукав." },
+        blackwork: { min: 50000, max: 80000, scope: "project", sessionNote: null, detail: "Цена за весь проект: внешняя часть или полный оборот руки." }
+      },
+      back: {
+        lines: { min: 15000, max: 30000, scope: "project", sessionNote: null, detail: "Цена за весь проект: часть спины или вся спина целиком." },
+        graphics: { min: 30000, max: 100000, scope: "project", sessionNote: null, detail: "Цена за весь проект: часть спины или вся спина целиком." },
+        color: { min: 30000, max: 120000, scope: "project", sessionNote: null, detail: "Цена за весь проект: часть спины или вся спина целиком." },
+        cover: { min: 40000, max: 120000, scope: "project", sessionNote: null, detail: "Цена за весь проект: часть спины или вся спина целиком." },
+        blackwork: { min: 40000, max: 120000, scope: "project", sessionNote: null, detail: "Цена за весь проект: часть спины или вся спина целиком." }
+      }
+    };
+
+    let currentStep = 0;
+    const selections = {
+      zone: null,
+      style: null,
+      sliderVal: null
+    };
+
+    const quizView = document.getElementById("quiz-view");
+    const resultView = document.getElementById("result-view");
+    const stepCounter = document.getElementById("step-counter");
+    const stepPercent = document.getElementById("step-percent");
+    const progressFill = document.getElementById("progress-fill");
+    const stepTitle = document.getElementById("step-title");
+    const stepSubtitle = document.getElementById("step-subtitle");
+    const optionsContainer = document.getElementById("options-container");
+    const stepBanner = document.getElementById("step-banner");
+    const backBtn = document.getElementById("back-btn");
+    const detailSlider = document.getElementById("detail-slider");
+
+    document.querySelectorAll(".js-ext-link").forEach(link => {
+      link.addEventListener("click", (e) => {
+        const url = link.dataset.url || link.getAttribute("href");
+        if (url) {
+          const opened = window.open(url, "_blank", "noopener,noreferrer");
+          if (opened) {
+            e.preventDefault();
+          }
+        }
+      });
+    });
+
+    function getAvailableStyles() {
+      if (selections.zone?.id === "up_to_5") {
+        return STYLES.filter(s => s.id === "lines");
+      }
+      return STYLES;
+    }
+
+    function renderStep() {
+      const totalSteps = 2;
+      const pct = Math.round(((currentStep + 1) / totalSteps) * 100);
+      stepCounter.textContent = `Шаг ${currentStep + 1} из ${totalSteps}`;
+      stepPercent.textContent = `${pct}%`;
+      progressFill.style.width = `${pct}%`;
+
+      backBtn.style.visibility = currentStep === 0 ? "hidden" : "visible";
+      optionsContainer.innerHTML = "";
+      stepBanner.classList.add("hidden");
+      stepBanner.textContent = "";
+
+      if (currentStep === 0) {
+        stepTitle.textContent = "1. Размер и зона";
+        stepSubtitle.textContent = "Выбери размер или участок тела";
+
+        ZONES.forEach(zone => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "option" + (selections.zone?.id === zone.id ? " selected" : "");
+          btn.innerHTML = `
+            <div class="opt-top">
+              <span class="opt-title">${zone.label}</span>
+              <span class="badge">${zone.badge}</span>
+            </div>
+            <div class="opt-desc">${zone.desc}</div>
+          `;
+          btn.addEventListener("click", () => {
+            selections.zone = zone;
+            selections.sliderVal = zone.slider.def;
+            const allowed = getAvailableStyles();
+            if (!allowed.some(s => s.id === selections.style?.id)) {
+              selections.style = null;
+            }
+            currentStep = 1;
+            renderStep();
+          });
+          optionsContainer.appendChild(btn);
+        });
+      } else if (currentStep === 1) {
+        stepTitle.textContent = "2. Стиль";
+        stepSubtitle.textContent = `Зона: ${selections.zone.label}. Выбери стиль работы`;
+
+        const availableStyles = getAvailableStyles();
+        if (selections.zone?.id === "up_to_5") {
+          stepBanner.textContent = "Для формата до 5 см доступен вариант «Линии / графика» (вилка 3–6 т.р. за всю работу).";
+          stepBanner.classList.remove("hidden");
+        }
+
+        availableStyles.forEach(style => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "option" + (selections.style?.id === style.id ? " selected" : "");
+          btn.innerHTML = `
+            <div class="opt-top">
+              <span class="opt-title">${style.label}</span>
+              <span class="badge">${style.badge}</span>
+            </div>
+            <div class="opt-desc">${style.desc}</div>
+          `;
+          btn.addEventListener("click", () => {
+            selections.style = style;
+            showResult();
+          });
+          optionsContainer.appendChild(btn);
+        });
+      }
+    }
+
+    function roundHundreds(value) {
+      return Math.round(value / 100) * 100;
+    }
+
+    function formatSliderText(zone, val) {
+      if (zone.slider.unit === "cm") {
+        return `~${val} см`;
+      }
+      return `${val}% заполнения`;
+    }
+
+    function computeDynamicRange(entry, zone, sliderVal) {
+      const { min: baseMin, max: baseMax } = entry;
+      if (baseMin === baseMax) {
+        return [baseMin, baseMax];
+      }
+
+      const s = zone.slider;
+      const t = (sliderVal - s.min) / (s.max - s.min);
+      const span = baseMax - baseMin;
+
+      const center = baseMin + span * t;
+      const halfSpread = Math.max(500, span * 0.18);
+
+      const low = Math.max(baseMin, roundHundreds(center - halfSpread));
+      const high = Math.min(baseMax, Math.max(low + 500, roundHundreds(center + halfSpread)));
+
+      return [low, Math.min(baseMax, high)];
+    }
+
+    function updateResultDisplay() {
+      const zone = selections.zone;
+      const style = selections.style;
+      const entry = PRICE_MATRIX[zone.id]?.[style.id] || PRICE_MATRIX[zone.id]?.lines;
+
+      const sliderVal = Number(detailSlider.value);
+      selections.sliderVal = sliderVal;
+      const sliderText = formatSliderText(zone, sliderVal);
+      document.getElementById("slider-val-label").textContent = sliderText;
+
+      const [low, high] = computeDynamicRange(entry, zone, sliderVal);
+      const scopeSuffix = entry.scope === "session" ? " / сеанс" : "";
+
+      const rangeStr = low === high
+        ? `${low.toLocaleString("ru-RU")} ₽${scopeSuffix}`
+        : `от ${low.toLocaleString("ru-RU")} до ${high.toLocaleString("ru-RU")} ₽${scopeSuffix}`;
+
+      document.getElementById("price-range").textContent = rangeStr;
+
+      const scopePill = document.getElementById("scope-pill");
+      if (entry.scope === "session") {
+        scopePill.textContent = "ЗА 1 СЕАНС";
+        scopePill.className = "scope-pill session";
+      } else {
+        scopePill.textContent = "ЗА ВЕСЬ ПРОЕКТ";
+        scopePill.className = "scope-pill project";
+      }
+
+      const sessionSub = document.getElementById("session-sub");
+      if (entry.sessionNote) {
+        sessionSub.textContent = entry.sessionNote;
+        sessionSub.classList.remove("hidden");
+      } else {
+        sessionSub.classList.add("hidden");
+      }
+
+      document.getElementById("price-detail").textContent = entry.detail;
+
+      document.getElementById("summary-list").innerHTML = `
+        <li><span>Размер / зона:</span> ${zone.label} (${sliderText})</li>
+        <li><span>Стиль:</span> ${style.label}</li>
+        <li><span>Формат цены:</span> ${entry.scope === "session" ? "за 1 сеанс" : "за весь проект"}</li>
+      `;
+
+      const shareText =
+        `Привет! Прошёл(ла) расчёт стоимости тату LIME TATTS:\n` +
+        `• Размер / зона: ${zone.label} (${sliderText})\n` +
+        `• Стиль: ${style.label}\n` +
+        `• Ориентир: ${rangeStr} (${entry.scope === "session" ? "цена за 1 сеанс" : "цена за весь проект"})\n` +
+        `${entry.sessionNote ? "• По сеансам: " + entry.sessionNote + "\n" : ""}` +
+        `Хочу уточнить детали лично и записаться на бесплатную консультацию с примеркой эскиза.`;
+
+      const copyBtn = document.getElementById("copy-btn");
+      const toast = document.getElementById("copied-toast");
+
+      copyBtn.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(shareText);
+          toast.textContent = "Текст скопирован — можно отправить в ВК или Telegram";
+        } catch {
+          toast.textContent = "Не удалось скопировать автоматически — выдели текст вручную";
+        }
+      };
+    }
+
+    function showResult() {
+      const zone = selections.zone;
+      const s = zone.slider;
+
+      document.getElementById("slider-title").textContent = s.title;
+      document.getElementById("tick-min").textContent = s.minLabel;
+      document.getElementById("tick-max").textContent = s.maxLabel;
+
+      detailSlider.min = s.min;
+      detailSlider.max = s.max;
+      detailSlider.step = s.step;
+      detailSlider.value = selections.sliderVal ?? s.def;
+
+      document.getElementById("copied-toast").textContent = "";
+      updateResultDisplay();
+
+      quizView.classList.add("hidden");
+      resultView.classList.remove("hidden");
+    }
+
+    detailSlider.addEventListener("input", updateResultDisplay);
+
+    backBtn.addEventListener("click", () => {
+      if (currentStep > 0) {
+        currentStep--;
+        renderStep();
+      }
+    });
+
+    document.getElementById("restart-btn").addEventListener("click", () => {
+      currentStep = 0;
+      selections.zone = null;
+      selections.style = null;
+      selections.sliderVal = null;
+      resultView.classList.add("hidden");
+      quizView.classList.remove("hidden");
+      renderStep();
+    });
+
+    renderStep();
+  </script>
+</body>
+</html>
+
